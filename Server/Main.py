@@ -21,17 +21,10 @@ Module implementing Main.
 
 """
 
-from Camera_Server import *
 from mTCPServer import mTCPServer
 
 if __name__ == "__main__":
     tcp = mTCPServer()
     tcp.setDaemon(True)
     tcp.start()
-
-    cmr_Thread = Camera_Server()
-    cmr_Thread.setDaemon(True)
-    cmr_Thread.start()
-
     tcp.join()
-    cmr_Thread.join()

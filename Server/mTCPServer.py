@@ -18,10 +18,13 @@
 import re
 from socket import *
 import threading
-from Command import COMMAND as cmd
-from mDev import *
 
-mdev = mDEV()
+import numpy as np
+
+from Command import COMMAND as cmd
+from i2c.shield import Shield
+
+mdev = Shield()
 
 
 class mTCPServer(threading.Thread):
@@ -95,48 +98,48 @@ class mTCPServer(threading.Thread):
                         except Exception as e:
                             print(e)
                             continue
-                        mdev.writeReg(mdev.CMD_DIR1, 1)
-                        mdev.writeReg(mdev.CMD_DIR2, 1)
-                        mdev.writeReg(mdev.CMD_PWM1, value * 10)
-                        mdev.writeReg(mdev.CMD_PWM2, value * 10)
+                        mdev.write(mdev.CMD_DIR1, 1)
+                        mdev.write(mdev.CMD_DIR2, 1)
+                        mdev.write(mdev.CMD_PWM1, value * 10)
+                        mdev.write(mdev.CMD_PWM2, value * 10)
                     elif cmd.CMD_BACKWARD[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_DIR1, 0)
-                        mdev.writeReg(mdev.CMD_DIR2, 0)
-                        mdev.writeReg(mdev.CMD_PWM1, value * 10)
-                        mdev.writeReg(mdev.CMD_PWM2, value * 10)
+                        mdev.write(mdev.CMD_DIR1, 0)
+                        mdev.write(mdev.CMD_DIR2, 0)
+                        mdev.write(mdev.CMD_PWM1, value * 10)
+                        mdev.write(mdev.CMD_PWM2, value * 10)
                         pass
                     elif cmd.CMD_TURN_LEFT[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_SERVO1, numMap(90 + value, 0, 180, 500, 2500))
+                        mdev.write(mdev.CMD_SERVO1, np.interp(90 + value, [0, 180], [500, 2500]))
                         pass
                     elif cmd.CMD_TURN_RIGHT[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_SERVO1, numMap(90 - value, 0, 180, 500, 2500))
+                        mdev.write(mdev.CMD_SERVO1, np.interp(90 - value, [0, 180], [500, 2500]))
                         pass
                     elif cmd.CMD_STOP[1:] in RecvData:
-                        mdev.writeReg(mdev.CMD_PWM1, 0)
-                        mdev.writeReg(mdev.CMD_PWM2, 0)
+                        mdev.write(mdev.CMD_PWM1, 0)
+                        mdev.write(mdev.CMD_PWM2, 0)
                         pass
                     elif cmd.CMD_TURN_CENTER[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_SERVO1, numMap(value, 0, 180, 500, 2500))
+                        mdev.write(mdev.CMD_SERVO1, np.interp(value, [0, 180], [500, 2500]))
                         pass
                     elif cmd.CMD_CAMERA_UP[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_SERVO3, numMap(value, 0, 180, 500, 2500))
+                        mdev.write(mdev.CMD_SERVO3, np.interp(value, [0, 180], [500, 2500]))
                         pass
                     elif cmd.CMD_CAMERA_DOWN[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_SERVO3, numMap(value, 0, 180, 500, 2500))
+                        mdev.write(mdev.CMD_SERVO3, np.interp(value, [0, 180], [500, 2500]))
                         pass
                     elif cmd.CMD_CAMERA_LEFT[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_SERVO2, numMap(value, 0, 180, 500, 2500))
+                        mdev.write(mdev.CMD_SERVO2, np.interp(value, [0, 180], [500, 2500]))
                         pass
                     elif cmd.CMD_CAMERA_RIGHT[1:] in RecvData:
                         value = int(re.findall('\d+', RecvData)[0])
-                        mdev.writeReg(mdev.CMD_SERVO2, numMap(value, 0, 180, 500, 2500))
+                        mdev.write(mdev.CMD_SERVO2, np.interp(value, [0, 180], [500, 2500]))
                         pass
                     elif cmd.CMD_CAMERA_STOP[1:] in RecvData:
                         pass
@@ -157,39 +160,39 @@ class mTCPServer(threading.Thread):
                         try:
                             value = int(re.findall('\d+', RecvData)[0])
                             if value != 0:
-                                mdev.writeReg(mdev.CMD_BUZZER, 2000)
+                                mdev.write(mdev.CMD_BUZZER, 2000)
                             elif value == 0:
-                                mdev.writeReg(mdev.CMD_BUZZER, 0)
+                                mdev.write(mdev.CMD_BUZZER, 0)
                         except Exception as e:
                             print("Command without parameters")
                             if mdev.Is_Buzzer_State_True is True:
                                 mdev.Is_Buzzer_State_True = False
-                                mdev.writeReg(mdev.CMD_BUZZER, 0)
+                                mdev.write(mdev.CMD_BUZZER, 0)
                             elif mdev.Is_Buzzer_State_True is False:
                                 mdev.Is_Buzzer_State_True = True
-                                mdev.writeReg(mdev.CMD_BUZZER, 2000)
+                                mdev.write(mdev.CMD_BUZZER, 2000)
 
                     elif cmd.CMD_RGB_B[1:] in RecvData:
                         if mdev.Is_IO3_State_True is True:
                             mdev.Is_IO3_State_True = False
-                            mdev.writeReg(mdev.CMD_IO3, 0)
+                            mdev.write(mdev.CMD_IO3, 0)
                         elif mdev.Is_IO3_State_True is False:
                             mdev.Is_IO3_State_True = True
-                            mdev.writeReg(mdev.CMD_IO3, 1)
+                            mdev.write(mdev.CMD_IO3, 1)
                     elif cmd.CMD_RGB_R[1:] in RecvData:
                         if mdev.Is_IO1_State_True is True:
                             mdev.Is_IO1_State_True = False
-                            mdev.writeReg(mdev.CMD_IO1, 0)
+                            mdev.write(mdev.CMD_IO1, 0)
                         elif mdev.Is_IO1_State_True is False:
                             mdev.Is_IO1_State_True = True
-                            mdev.writeReg(mdev.CMD_IO1, 1)
+                            mdev.write(mdev.CMD_IO1, 1)
                     elif cmd.CMD_RGB_G[1:] in RecvData:
                         if mdev.Is_IO2_State_True is True:
                             mdev.Is_IO2_State_True = False
-                            mdev.writeReg(mdev.CMD_IO2, 0)
+                            mdev.write(mdev.CMD_IO2, 0)
                         elif mdev.Is_IO2_State_True is False:
                             mdev.Is_IO2_State_True = True
-                            mdev.writeReg(mdev.CMD_IO2, 1)
+                            mdev.write(mdev.CMD_IO2, 1)
                     elif cmd.CMD_ULTRASONIC[1:] in RecvData:
                         sonic = mdev.getSonic()
                         self.sendData(str(sonic))

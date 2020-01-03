@@ -64,6 +64,9 @@ class mDEV:
         self.bus.write_byte(self.address, value)
 
     def writeReg(self, cmd, value):
+        if not isinstance(value, int):
+            value = int(value)
+
         try:
             self.bus.write_i2c_block_data(self.address, cmd, [value >> 8, value & 0xff])
             time.sleep(0.001)

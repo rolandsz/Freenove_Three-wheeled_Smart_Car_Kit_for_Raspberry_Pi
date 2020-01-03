@@ -15,6 +15,7 @@
  *   (http://creativecommons.org/licenses/by-sa/3.0/legalcode)
  ******************************************************************************
 """
+import re
 from socket import *
 import threading
 from Command import COMMAND as cmd
@@ -42,6 +43,7 @@ class mTCPServer(threading.Thread):
     def startTCPServer(self):
         self.sock = socket(AF_INET, SOCK_STREAM)
         try:
+            self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
             self.sock.bind(self.ADDR)
         except Exception as e:
             print("Bind Error : ", e)
@@ -73,7 +75,7 @@ class mTCPServer(threading.Thread):
 
             while True:
                 try:
-                    RecvData_ALL = self.tcpClientSock.recv(self.BUFSIZ)
+                    RecvData_ALL = self.tcpClientSock.recv(self.BUFSIZ).decode('utf-8')
                 except Exception as e:
                     print(e)
                     self.tcpClientSock.close()
@@ -81,7 +83,7 @@ class mTCPServer(threading.Thread):
                 if not RecvData_ALL:
                     break
                 # print RecvData_ALL
-                RecvData_Array = RecvData_ALL.split('>'.encode("utf-8"))
+                RecvData_Array = RecvData_ALL.split('>')
                 print(RecvData_Array)
                 for RecvData in RecvData_Array:
                     if RecvData == "":
@@ -89,7 +91,7 @@ class mTCPServer(threading.Thread):
                     print("RecvData  : ", RecvData)
                     if cmd.CMD_FORWARD[1:] in RecvData:
                         try:
-                            value = int(filter(str.isdigit, RecvData))
+                            value = int(re.findall('\d+', RecvData)[0])
                         except Exception as e:
                             print(e)
                             continue
@@ -98,18 +100,18 @@ class mTCPServer(threading.Thread):
                         mdev.writeReg(mdev.CMD_PWM1, value * 10)
                         mdev.writeReg(mdev.CMD_PWM2, value * 10)
                     elif cmd.CMD_BACKWARD[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_DIR1, 0)
                         mdev.writeReg(mdev.CMD_DIR2, 0)
                         mdev.writeReg(mdev.CMD_PWM1, value * 10)
                         mdev.writeReg(mdev.CMD_PWM2, value * 10)
                         pass
                     elif cmd.CMD_TURN_LEFT[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_SERVO1, numMap(90 + value, 0, 180, 500, 2500))
                         pass
                     elif cmd.CMD_TURN_RIGHT[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_SERVO1, numMap(90 - value, 0, 180, 500, 2500))
                         pass
                     elif cmd.CMD_STOP[1:] in RecvData:
@@ -117,23 +119,23 @@ class mTCPServer(threading.Thread):
                         mdev.writeReg(mdev.CMD_PWM2, 0)
                         pass
                     elif cmd.CMD_TURN_CENTER[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_SERVO1, numMap(value, 0, 180, 500, 2500))
                         pass
                     elif cmd.CMD_CAMERA_UP[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_SERVO3, numMap(value, 0, 180, 500, 2500))
                         pass
                     elif cmd.CMD_CAMERA_DOWN[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_SERVO3, numMap(value, 0, 180, 500, 2500))
                         pass
                     elif cmd.CMD_CAMERA_LEFT[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_SERVO2, numMap(value, 0, 180, 500, 2500))
                         pass
                     elif cmd.CMD_CAMERA_RIGHT[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         mdev.writeReg(mdev.CMD_SERVO2, numMap(value, 0, 180, 500, 2500))
                         pass
                     elif cmd.CMD_CAMERA_STOP[1:] in RecvData:
@@ -141,19 +143,19 @@ class mTCPServer(threading.Thread):
                     elif cmd.CMD_CAMERA_CENTER[1:] in RecvData:
                         pass
                     elif cmd.CMD_SPEED_SLIDER[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         print(value)
                         pass
                     elif cmd.CMD_DIR_SLIDER[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         print(value)
                         pass
                     elif cmd.CMD_CAMERA_SLIDER[1:] in RecvData:
-                        value = int(filter(str.isdigit, RecvData))
+                        value = int(re.findall('\d+', RecvData)[0])
                         print(value)
                     elif cmd.CMD_BUZZER_ALARM[1:] in RecvData:
                         try:
-                            value = int(filter(str.isdigit, RecvData))
+                            value = int(re.findall('\d+', RecvData)[0])
                             if value != 0:
                                 mdev.writeReg(mdev.CMD_BUZZER, 2000)
                             elif value == 0:

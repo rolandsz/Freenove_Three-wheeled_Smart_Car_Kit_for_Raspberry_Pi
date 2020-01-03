@@ -81,13 +81,12 @@ class mTCPServer(threading.Thread):
                 if not RecvData_ALL:
                     break
                 # print RecvData_ALL
-                RecvData_Array = RecvData_ALL.split(">")
+                RecvData_Array = RecvData_ALL.split('>'.encode("utf-8"))
                 print(RecvData_Array)
                 for RecvData in RecvData_Array:
                     if RecvData == "":
                         continue
-                    print
-                    "RecvData  : ", RecvData
+                    print("RecvData  : ", RecvData)
                     if cmd.CMD_FORWARD[1:] in RecvData:
                         try:
                             value = int(filter(str.isdigit, RecvData))

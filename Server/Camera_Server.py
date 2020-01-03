@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
  ******************************************************************************
  * File  Camrea_Server.py
@@ -19,19 +19,20 @@
 import threading
 import os
 
-class Camera_Server(threading.Thread):
-	def camera_Http_Server(self):
-		os.system("sudo sh Start_mjpg_Streamer.sh")
-		
-	def run(self):
-		print(".............Camera server starting ......")
-		self.camera_Http_Server()
-		print(".............Camera server stop...........")
-		
-	def stop(self):
-		os.system("sudo sh Stop_mjpg_Streamer.sh")
-		
-class Stop_Camera_Server(threading.Thread):
-	def run(self):
-		os.system("sudo sh Stop_mjpg_Streamer.sh")
 
+class Camera_Server(threading.Thread):
+    def camera_Http_Server(self):
+        os.system("sudo sh Start_mjpg_Streamer.sh")
+
+    def run(self):
+        print(".............Camera server starting ......")
+        self.camera_Http_Server()
+        print(".............Camera server stop...........")
+
+    def stop(self):
+        os.system("sudo sh Stop_mjpg_Streamer.sh")
+
+
+class Stop_Camera_Server(threading.Thread):
+    def run(self):
+        os.system("sudo sh Stop_mjpg_Streamer.sh")

@@ -24,7 +24,6 @@ Module implementing Main.
 from Camera_Server import *
 from mTCPServer import mTCPServer
 
-
 if __name__ == "__main__":
     tcp = mTCPServer()
     tcp.setDaemon(True)

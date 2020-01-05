@@ -72,3 +72,11 @@ fabric.properties
 
 # Cache
 __pycache__
+
+# Generated
+generated
+!generated/__init__.py
+
+# SSL
+ssl
+!ssl/.gitkeep

@@ -18,7 +18,7 @@ def run_server(controller, port):
     add_CarControlServicer_to_server(CarControlServicer(controller), server)
 
     server_credentials = grpc.ssl_server_credentials(
-            [(read_pem('ssl/server-key.pem'), read_pem('ssl/server.pem'))],
+            [(read_pem('ssl/api-key.pem'), read_pem('ssl/api.pem'))],
             root_certificates=read_pem('ssl/ca.pem'),
             require_client_auth=True
     )

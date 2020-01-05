@@ -2,5 +2,5 @@
 !.gitignore
 !ca-config.json
 !ca-csr.json
+!api-csr.json
 !client-csr.json
-!server-csr.json

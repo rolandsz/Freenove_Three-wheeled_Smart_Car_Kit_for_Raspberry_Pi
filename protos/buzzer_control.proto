@@ -1,0 +1,12 @@
+syntax = "proto3";
+package freenove.smart_car;
+
+message SetFrequencyRequest {
+  uint32 frequency = 1;
+}
+
+message SetFrequencyResponse {}
+
+service BuzzerControl {
+  rpc SetFrequency(SetFrequencyRequest) returns (SetFrequencyResponse) {}
+}

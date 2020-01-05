@@ -4,7 +4,10 @@ import logging
 import grpc
 
 from concurrent import futures
+
+from buzzer_control_servicer import BuzzerControlServicer
 from car_control_servicer import CarControlServicer
+from generated.buzzer_control_pb2_grpc import add_BuzzerControlServicer_to_server
 from generated.car_control_pb2_grpc import add_CarControlServicer_to_server
 from generated.led_control_pb2_grpc import add_LedControlServicer_to_server
 from hardware.controller import Controller
@@ -17,6 +20,7 @@ def run_server(controller, port):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=1),
                          interceptors=(CarKeyValidationInterceptor(),))
 
+    add_BuzzerControlServicer_to_server(BuzzerControlServicer(controller), server)
     add_CarControlServicer_to_server(CarControlServicer(controller), server)
     add_LedControlServicer_to_server(LedControlServicer(controller), server)
 

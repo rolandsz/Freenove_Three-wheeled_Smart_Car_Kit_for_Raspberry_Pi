@@ -1,4 +1,0 @@
-[submodule "mjpg-streamer"]
-	path = mjpg-streamer
-	url = https://github.com/jacksonliam/mjpg-streamer.git
-	branch = master

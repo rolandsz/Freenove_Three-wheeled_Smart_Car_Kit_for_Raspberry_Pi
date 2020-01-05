@@ -1,9 +1,12 @@
 import hashlib
+import logging
 import os
 import re
 import grpc
 
 from functools import lru_cache
+
+logger = logging.getLogger(__name__)
 
 
 def read_pem(file_path):
@@ -27,6 +30,7 @@ class CarKeyValidationInterceptor(grpc.ServerInterceptor):
 
     def __init__(self):
         def abort(request, context):
+            logger.warning('Invalid car key received')
             context.abort(grpc.StatusCode.UNAUTHENTICATED, 'Invalid car key')
 
         self.abort_handler = grpc.unary_unary_rpc_method_handler(abort)

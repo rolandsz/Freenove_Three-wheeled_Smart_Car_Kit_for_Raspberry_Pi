@@ -1,0 +1,19 @@
+syntax = "proto3";
+package freenove.smart_car;
+
+message SetVelocityRequest {
+  float velocity = 1;
+}
+
+message SetVelocityResponse {}
+
+message SetSteeringAngleRequest {
+  float angle = 1;
+}
+
+message SetSteeringAngleResponse {}
+
+service CarControl {
+  rpc SetVelocity(SetVelocityRequest) returns (SetVelocityResponse) {}
+  rpc SetSteeringAngle(SetSteeringAngleRequest) returns (SetSteeringAngleResponse) {}
+}

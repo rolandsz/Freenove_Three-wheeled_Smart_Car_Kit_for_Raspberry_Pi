@@ -1,0 +1,16 @@
+{
+  "CN": "Freenove Smart Car CA",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "HU",
+      "L": "Budapest",
+      "ST": "Pest",
+      "O": "Freenove",
+      "OU": "Smart Car"
+    }
+  ]
+}

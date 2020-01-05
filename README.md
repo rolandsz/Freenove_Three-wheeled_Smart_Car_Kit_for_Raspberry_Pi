@@ -44,7 +44,7 @@ pipenv install --dev
 The interface definitions must be generated from .proto files.
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
-pipenv run python -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/car_control.proto
+pipenv run python -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/buzzer_control.proto ../protos/camera_control.proto ../protos/car_control.proto ../protos/led_control.proto ../protos/ultrasonic_control.proto
 ```
 
 ## Usage

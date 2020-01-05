@@ -1,0 +1,6 @@
+*
+!.gitignore
+!ca-config.json
+!ca-csr.json
+!client-csr.json
+!server-csr.json

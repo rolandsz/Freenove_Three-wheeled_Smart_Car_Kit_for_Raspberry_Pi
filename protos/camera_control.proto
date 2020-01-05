@@ -1,0 +1,13 @@
+syntax = "proto3";
+package freenove.smart_car;
+
+message SetRotationRequest {
+  float horizontal = 1;
+  float vertical = 2;
+}
+
+message SetRotationResponse {}
+
+service CameraControl {
+  rpc SetRotation(SetRotationRequest) returns (SetRotationResponse) {}
+}

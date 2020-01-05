@@ -1,11 +1,11 @@
 """
  ******************************************************************************
- * File  shield.py
+ * File  controller.py
  * Author  Freenove (http://www.freenove.com)
  * Date    2016/11/14
  ******************************************************************************
  * Brief
- *   This is the Class Shield. Used for Control the Shield.
+ *   This is the Class Controller. Used for Control the Shield.
  ******************************************************************************
  * Copyright
  *   Copyright © Freenove (http://www.freenove.com)
@@ -16,11 +16,12 @@
 """
 import time
 import smbus
+import logging
 
-from threading import Lock
+logger = logging.getLogger(__name__)
 
 
-class Shield:
+class Controller:
     CMD_SERVO1 = 0
     CMD_SERVO2 = 1
     CMD_SERVO3 = 2
@@ -37,21 +38,16 @@ class Shield:
     SERVO_MAX_PULSE_WIDTH = 2500
     SERVO_MIN_PULSE_WIDTH = 500
     SONIC_MAX_HIGH_BYTE = 50
-    Is_IO1_State_True = False
-    Is_IO2_State_True = False
-    Is_IO3_State_True = False
-    Is_Buzzer_State_True = False
-    handle = True
-    mutex = Lock()
+    DIRECTION_BACKWARD = 0
+    DIRECTION_FORWARD = 1
 
-    def __init__(self, address=0x18):
+    def __init__(self, address):
         self.address = address
         self.bus = smbus.SMBus(1)
         self.bus.open(1)
 
     def write(self, cmd, value):
-        if not isinstance(value, int):
-            value = int(value)
+        logger.debug('Writing register {} with value {}'.format(cmd, value))
 
         try:
             self.bus.write_i2c_block_data(self.address, cmd, [value >> 8, value & 0xff])
@@ -61,9 +57,11 @@ class Shield:
             self.bus.write_i2c_block_data(self.address, cmd, [value >> 8, value & 0xff])
             time.sleep(0.001)
         except Exception as e:
-            print(Exception, "Shield write error :", e)
+            print(Exception, 'Shield write error :', e)
 
     def read(self, cmd):
+        logger.debug('Reading register {}', cmd)
+
         ##################################################################################################
         # Due to the update of SMBus, the communication between Pi and the shield board is not normal.
         # through the following code to improve the success rate of communication.

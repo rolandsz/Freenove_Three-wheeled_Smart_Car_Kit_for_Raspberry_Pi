@@ -1,6 +1,12 @@
 syntax = "proto3";
 package freenove.smart_car;
 
+message SetUltrasonicRotationRequest {
+  float horizontal = 1;
+}
+
+message SetUltrasonicRotationResponse {}
+
 message GetDistanceRequest {}
 
 message GetDistanceResponse {
@@ -8,5 +14,6 @@ message GetDistanceResponse {
 }
 
 service UltrasonicControl {
+  rpc SetRotation(SetUltrasonicRotationRequest) returns (SetUltrasonicRotationResponse) {}
   rpc GetDistance(GetDistanceRequest) returns (GetDistanceResponse) {}
 }

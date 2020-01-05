@@ -1,0 +1,14 @@
+syntax = "proto3";
+package freenove.smart_car;
+
+message SetColorRequest {
+  bool r = 1;
+  bool g = 2;
+  bool b = 3;
+}
+
+message SetColorResponse {}
+
+service LedControl {
+  rpc SetColor(SetColorRequest) returns (SetColorResponse) {}
+}

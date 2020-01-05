@@ -6,7 +6,9 @@ import grpc
 from concurrent import futures
 from car_control_servicer import CarControlServicer
 from generated.car_control_pb2_grpc import add_CarControlServicer_to_server
+from generated.led_control_pb2_grpc import add_LedControlServicer_to_server
 from hardware.controller import Controller
+from led_control_servicer import LedControlServicer
 from utils.security import read_pem, CarKeyValidationInterceptor, get_car_key
 
 
@@ -16,6 +18,7 @@ def run_server(controller, port):
                          interceptors=(CarKeyValidationInterceptor(),))
 
     add_CarControlServicer_to_server(CarControlServicer(controller), server)
+    add_LedControlServicer_to_server(LedControlServicer(controller), server)
 
     server_credentials = grpc.ssl_server_credentials(
             [(read_pem('ssl/api-key.pem'), read_pem('ssl/api.pem'))],

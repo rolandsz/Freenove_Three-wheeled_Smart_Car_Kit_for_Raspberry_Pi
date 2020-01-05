@@ -1,0 +1,12 @@
+syntax = "proto3";
+package freenove.smart_car;
+
+message GetDistanceRequest {}
+
+message GetDistanceResponse {
+  float distance = 1;
+}
+
+service UltrasonicControl {
+  rpc GetDistance(GetDistanceRequest) returns (GetDistanceResponse) {}
+}

@@ -4,7 +4,6 @@
 
 In this section you may find detailed instructions about the setup of the project. 
 
----
 ### SSL
 In order to secure the connection between the car and the client you'll need to generate SSL certificates. An example using [CloudFlare's PKI toolkit](https://blog.cloudflare.com/introducing-cfssl/) is provided below.
 #### Certificate Authority
@@ -30,14 +29,13 @@ This command creates a certificate for the client and signs it with the previous
 cfssl gencert --ca=ssl/ca.pem --ca-key=ssl/ca-key.pem --config=ssl/ca-config.json ssl/client-csr.json | cfssljson --bare client/ssl/client
 ```
 
----
 ### API
-The gRPC API runs on the Raspberry PI and is used to control the car remotely. You'll need to copy the *api* folder to the Raspberry PI and execute the following commands in order.
+The gRPC API runs on the Raspberry PI and is used to control the car remotely. You'll need to copy the *api* and *protos* folders to the Raspberry PI and execute the following commands in order.
 
 #### Pipenv
 Project dependencies are managed via pipenv.
 ```
-cd ~/api
+cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
 pip3 install pipenv
 pipenv install --dev
 ```
@@ -45,13 +43,13 @@ pipenv install --dev
 #### gRPC
 The interface definitions must be generated from .proto files.
 ```
-cd ~/api
+cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
 pipenv run python -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/car_control.proto
 ```
 
 ## Usage
 ### API
 ```
-cd ~/api
+cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
 pipenv run python api.py
 ```

@@ -68,22 +68,25 @@ class Controller:
         # But if there are conditions, the best solution is to update the firmware of the shield board.
         ##################################################################################################
         for i in range(0, 10, 1):
-            self.bus.write_i2c_block_data(self.address, cmd, [0])
-            a = self.bus.read_i2c_block_data(self.address, cmd, 1)
+            try:
+                self.bus.write_i2c_block_data(self.address, cmd, [0])
+                a = self.bus.read_i2c_block_data(self.address, cmd, 1)
 
-            self.bus.write_byte(self.address, cmd + 1)
-            b = self.bus.read_i2c_block_data(self.address, cmd + 1, 1)
+                self.bus.write_byte(self.address, cmd + 1)
+                b = self.bus.read_i2c_block_data(self.address, cmd + 1, 1)
 
-            self.bus.write_byte(self.address, cmd)
-            c = self.bus.read_byte_data(self.address, cmd)
+                self.bus.write_byte(self.address, cmd)
+                c = self.bus.read_byte_data(self.address, cmd)
 
-            self.bus.write_byte(self.address, cmd + 1)
-            d = self.bus.read_byte_data(self.address, cmd + 1)
-            # print i,a,b,c,d
-            # '''
-            if a[0] == c and c < self.SONIC_MAX_HIGH_BYTE:  # and b[0] == d
-                return c << 8 | d
-            else:
-                continue
+                self.bus.write_byte(self.address, cmd + 1)
+                d = self.bus.read_byte_data(self.address, cmd + 1)
+                # print i,a,b,c,d
+                # '''
+                if a[0] == c and c < self.SONIC_MAX_HIGH_BYTE:  # and b[0] == d
+                    return c << 8 | d
+                else:
+                    continue
+            except Exception as e:
+                logger.error('Shield read error: {}'.format(str(e)))
 
         return 0

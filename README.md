@@ -32,24 +32,22 @@ cfssl gencert --ca=ssl/ca.pem --ca-key=ssl/ca-key.pem --config=ssl/ca-config.jso
 ### API
 The gRPC API runs on the Raspberry PI and is used to control the car remotely. You'll need to copy the *api* and *protos* folders to the Raspberry PI and execute the following commands in order.
 
-#### Pipenv
-Project dependencies are managed via pipenv.
+#### Python
+You can install Python dependencies with the following command.
 ```
-cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
-pip3 install pipenv
-pipenv install --dev
+sudo apt install python3-grpcio python3-grpc-tools python3-opencv
 ```
 
 #### gRPC
 The interface definitions must be generated from .proto files.
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
-pipenv run python -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/buzzer_control.proto ../protos/camera_control.proto ../protos/car_control.proto ../protos/led_control.proto ../protos/ultrasonic_control.proto
+python3 -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/buzzer_control.proto ../protos/camera_control.proto
 ```
 
 ## Usage
 ### API
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
-pipenv run python api.py
+python3 api.py
 ```

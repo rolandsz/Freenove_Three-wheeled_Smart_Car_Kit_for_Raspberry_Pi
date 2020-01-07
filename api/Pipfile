@@ -10,6 +10,7 @@ grpcio-tools = "*"
 smbus = "*"
 numpy = "*"
 grpcio = "*"
+opencv-python-headless = "==4.1.1.26"
 
 [requires]
 python_version = "3.7"

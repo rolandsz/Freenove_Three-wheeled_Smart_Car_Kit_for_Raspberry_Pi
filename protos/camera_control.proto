@@ -8,6 +8,13 @@ message SetCameraRotationRequest {
 
 message SetCameraRotationResponse {}
 
+message GetFrameRequest {}
+
+message GetFrameResponse {
+  bytes frame = 1;
+}
+
 service CameraControl {
   rpc SetRotation(SetCameraRotationRequest) returns (SetCameraRotationResponse) {}
+  rpc GetFrame(GetFrameRequest) returns (GetFrameResponse) {}
 }

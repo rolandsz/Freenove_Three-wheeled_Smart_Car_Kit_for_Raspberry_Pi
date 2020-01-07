@@ -1,6 +1,7 @@
 import argparse
 import contextlib
 import logging
+import signal
 import grpc
 
 from concurrent import futures
@@ -55,8 +56,8 @@ def main():
 
     logging.info('The key of the car is {}'.format(get_car_key()))
 
-    with run_server(controller, args['port']) as server:
-        server.wait_for_termination()
+    with run_server(controller, args['port']):
+        signal.pause()
 
 
 if __name__ == '__main__':

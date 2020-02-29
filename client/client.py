@@ -31,7 +31,7 @@ def main(args):
     app = QApplication(sys.argv)
 
     with create_client_channel('{}:{}'.format(args['address'], args['port']), args['car_key']) as channel:
-        main_widget = MainWidget(channel)
+        main_widget = MainWidget(app, channel)
         main_widget.show()
 
     sys.exit(app.exec_())

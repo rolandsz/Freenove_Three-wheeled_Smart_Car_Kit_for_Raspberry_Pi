@@ -62,7 +62,6 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('-p', '--port', type=int, default=50051, help='Listening port')
     ap.add_argument('-v', '--verbose', help='Show all log messages', action='store_true')
-
     args = vars(ap.parse_args())
 
     main(args)

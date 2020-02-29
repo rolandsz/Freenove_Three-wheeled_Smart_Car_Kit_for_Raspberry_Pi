@@ -1,3 +1,4 @@
+
 # Freenove Three-wheeled Smart Car Kit for Raspberry Pi
 
 ## Setup
@@ -32,22 +33,35 @@ cfssl gencert --ca=ssl/ca.pem --ca-key=ssl/ca-key.pem --config=ssl/ca-config.jso
 ### API
 The gRPC API runs on the Raspberry PI and is used to control the car remotely. You'll need to copy the *api* and *protos* folders to the Raspberry PI and execute the following commands in order.
 
-#### Python
-You can install Python dependencies with the following command.
 ```
 sudo apt install python3-grpcio python3-grpc-tools python3-opencv
+
+cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
+python3 -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/buzzer_control.proto ../protos/camera_control.proto ../protos/car_control.proto ../protos/led_control.proto ../protos/ultrasonic_control.proto 
 ```
 
-#### gRPC
-The interface definitions must be generated from .proto files.
+### Client
+The client is a PyQt5 application that connects to the API running on the Raspberry PI via gRPC, which means you may run the client on an arbitrary device of your choice. You’ll need to setup the environment and generate the interface definitions by executing the following commands in order.
+
 ```
-cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
-python3 -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/buzzer_control.proto ../protos/camera_control.proto
+cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/client
+conda create --name smart-car-client python=3
+conda activate smart-car-client
+pip install -r requirements.txt
+
+python -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/buzzer_control.proto ../protos/camera_control.proto ../protos/car_control.proto ../protos/led_control.proto ../protos/ultrasonic_control.proto 
 ```
 
 ## Usage
 ### API
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
-python3 api.py
+python3 api.py --port 50051
+```
+
+### Client
+```
+cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/client
+conda activate smart-car-client
+python client.py --address raspberrypi --port 50051 --car-key <your unique car key displayed by the API upon startup>
 ```

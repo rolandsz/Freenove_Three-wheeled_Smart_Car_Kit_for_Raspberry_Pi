@@ -47,10 +47,8 @@ def run_server(controller, port):
         server.stop(0)
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('-p', '--port', type=int, default=50051, help='Listening port')
-    args = vars(ap.parse_args())
+def main(args):
+    logging.basicConfig(level=logging.DEBUG if args['verbose'] else logging.INFO)
 
     controller = Controller(0x18)
 
@@ -61,5 +59,10 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    main()
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-p', '--port', type=int, default=50051, help='Listening port')
+    ap.add_argument('-v', '--verbose', help='Show all log messages', action='store_true')
+
+    args = vars(ap.parse_args())
+
+    main(args)

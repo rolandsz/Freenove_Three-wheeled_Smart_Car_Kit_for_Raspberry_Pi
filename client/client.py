@@ -40,7 +40,7 @@ def main(args):
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('-a', '--address', default='raspberrypi', help='Address of the Raspberry PI')
-    ap.add_argument('-p', '--port', default=50051, help='Listening port of the API')
+    ap.add_argument('-p', '--port', type=int, default=50051, help='Listening port of the API')
     ap.add_argument('-ck', '--car-key', required=True, help='Key of the car')
     ap.add_argument('-v', '--verbose', help='Show all log messages', action='store_true')
     args = vars(ap.parse_args())

@@ -15,7 +15,7 @@ class LedControlServicer(generated.led_control_pb2_grpc.LedControlServicer):
     def SetColor(self, request, context):
         logger.info('Set color to R={} G={} B={}'.format(request.r, request.g, request.b))
 
-        self.controller.write(Controller.CMD_IO1, int(request.r))
-        self.controller.write(Controller.CMD_IO2, int(request.g))
-        self.controller.write(Controller.CMD_IO3, int(request.b))
+        self.controller.write(Controller.CMD_IO1, int(not request.r))
+        self.controller.write(Controller.CMD_IO2, int(not request.g))
+        self.controller.write(Controller.CMD_IO3, int(not request.b))
         return SetColorResponse()

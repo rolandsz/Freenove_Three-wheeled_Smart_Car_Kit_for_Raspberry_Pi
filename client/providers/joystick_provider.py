@@ -4,14 +4,14 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
 import pygame
 
-from utils.service import Service
+from utils.provider import Service
 from PyQt5.QtCore import pyqtSignal
 from pygame.event import EventType
 
 logger = logging.getLogger(__name__)
 
 
-class JoystickService(Service):
+class JoystickProvider(Service):
     on_input_ready = pyqtSignal(EventType)
 
     def __init__(self, app, id=0):

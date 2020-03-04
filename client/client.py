@@ -5,8 +5,8 @@ import grpc
 import argparse
 
 from PyQt5.QtWidgets import QApplication
-from services.camera_service import CameraService
-from services.joystick_service import JoystickService
+from providers.camera_provider import CameraProvider
+from providers.joystick_provider import JoystickProvider
 from widgets.main_widget import MainWidget
 from utils.security import CarKey, read_pem
 
@@ -32,22 +32,22 @@ def main(args):
 
     app = QApplication(sys.argv)
 
-    logging.debug('Initializing services')
+    logging.debug('Initializing providers')
 
     with create_client_channel('{}:{}'.format(args['address'], args['port']), args['car_key']) as channel:
-        services = {
-            'camera': CameraService(app, channel),
-            'joystick': JoystickService(app)
+        providers = {
+            'camera': CameraProvider(app, channel),
+            'joystick': JoystickProvider(app)
         }
 
-    logging.debug('Starting services')
+    logging.debug('Starting providers')
 
-    for service in services.values():
-        service.start()
+    for provider in providers.values():
+        provider.start()
 
     logging.debug('Initializing main widget')
 
-    main_widget = MainWidget(services)
+    main_widget = MainWidget(providers)
     main_widget.show()
 
     sys.exit(app.exec_())

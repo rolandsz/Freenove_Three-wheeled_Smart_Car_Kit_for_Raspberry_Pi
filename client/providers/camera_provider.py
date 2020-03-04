@@ -4,12 +4,12 @@ import time
 from PyQt5.QtCore import pyqtSignal
 from generated.camera_control_pb2 import GetFrameRequest
 from generated.camera_control_pb2_grpc import CameraControlStub
-from utils.service import Service
+from utils.provider import Service
 
 logger = logging.getLogger(__name__)
 
 
-class CameraService(Service):
+class CameraProvider(Service):
     on_frame_ready = pyqtSignal(bytes)
 
     def __init__(self, app, channel, target_fps=8):

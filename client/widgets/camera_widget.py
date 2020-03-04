@@ -12,61 +12,25 @@ logger = logging.getLogger(__name__)
 
 class CameraWidget(QGroupBox):
 
-    class CameraStream(QLabel):
+    class CameraFrame(QLabel):
 
-        class CameraFrameFetchThread(QThread):
-            frame_ready = pyqtSignal(QPixmap)
-
-            def __init__(self, channel, target_fps):
-                super().__init__()
-                self.running = False
-                self.target_fps = target_fps
-                self.camera_control = CameraControlStub(channel)
-
-            def run(self):
-                self.running = True
-
-                while self.running:
-                    start = time.time()
-
-                    response = self.camera_control.GetFrame(GetFrameRequest())
-                    frame = response.frame
-                    logger.debug('Received camera frame contains {} bytes'.format(len(frame)))
-
-                    self.frame_ready.emit(self.frame_to_pixmap(frame))
-
-                    end = time.time()
-                    sleep_for = (1 / self.target_fps) - (end - start)
-                    logger.debug('sleep_for={}'.format(sleep_for))
-
-                    if sleep_for > 0:
-                        time.sleep(sleep_for)
-
-            @staticmethod
-            def frame_to_pixmap(frame):
-                pixmap = QPixmap()
-                pixmap.loadFromData(frame)
-                return pixmap
-
-            def stop(self):
-                self.running = False
-
-        def __init__(self, app, channel, width=352, height=288, target_fps=8):
+        def __init__(self, services, width=352, height=288):
             super().__init__()
-            logger.debug('Initialized camera stream with parameters width={} height={} target_fps={}'.format(width, height, target_fps))
-
             self.resize(width, height)
 
-            self.thread = CameraWidget.CameraStream.CameraFrameFetchThread(channel, target_fps)
-            self.thread.frame_ready.connect(self.on_frame_ready)
-            app.aboutToQuit.connect(self.thread.stop)
-            self.thread.start()
+            services['camera'].on_frame_ready.connect(self.on_frame_ready)
 
         def on_frame_ready(self, frame):
-            self.setPixmap(frame)
+            self.setPixmap(self.frame_to_pixmap(frame))
 
-    def __init__(self, app, channel):
+        @staticmethod
+        def frame_to_pixmap(frame):
+            pixmap = QPixmap()
+            pixmap.loadFromData(frame)
+            return pixmap
+
+    def __init__(self, services):
         super().__init__('Camera')
         layout = QVBoxLayout()
-        layout.addWidget(CameraWidget.CameraStream(app, channel))
+        layout.addWidget(CameraWidget.CameraFrame(services))
         self.setLayout(layout)

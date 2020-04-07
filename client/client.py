@@ -40,15 +40,15 @@ def main(args):
             'joystick': JoystickProvider(app)
         }
 
-    logging.debug('Starting providers')
+        logging.debug('Starting providers')
 
-    for provider in providers.values():
-        provider.start()
+        for provider in providers.values():
+            provider.start()
 
-    logging.debug('Initializing main widget')
+        logging.debug('Initializing main widget')
 
-    main_widget = MainWidget(providers)
-    main_widget.show()
+        main_widget = MainWidget(providers, channel)
+        main_widget.show()
 
     sys.exit(app.exec_())
 

@@ -30,14 +30,33 @@ This command creates a certificate for the client and signs it with the previous
 cfssl gencert --ca=ssl/ca.pem --ca-key=ssl/ca-key.pem --config=ssl/ca-config.json ssl/client-csr.json | cfssljson --bare client/ssl/client
 ```
 
-### API
-The gRPC API runs on the Raspberry PI and is used to control the car remotely. You'll need to copy the *api* and *protos* folders to the Raspberry PI and execute the following commands in order.
+### mjpg-streamer
+
+The mjpg-streamer runs on the Raspberry PI and it is used to live stream what the car sees.
 
 ```
-sudo apt install python3-grpcio python3-grpc-tools python3-opencv
+sudo apt install cmake libjpeg8-dev
+
+git clone https://github.com/rolandsz/mjpg-streamer.git
+cd mjpg-streamer/mjpg-streamer-experimental/
+make -j4
+sudo make install
+```
+
+### API
+The gRPC API runs on the Raspberry PI and it is used to control the car remotely. You'll need to copy the *api* and *protos* folders to the Raspberry PI and execute the following commands in order.
+
+```
+sudo apt install python3-grpcio python3-grpc-tools
 
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
 python3 -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_out=./generated ../protos/buzzer_control.proto ../protos/camera_control.proto ../protos/car_control.proto ../protos/led_control.proto ../protos/ultrasonic_control.proto 
+```
+
+You will also need to enable I2C by exeuting the following command and selecting Interfacing Options > I2C.
+
+```
+sudo raspi-config
 ```
 
 ### Client

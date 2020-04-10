@@ -1,62 +1,54 @@
-import sys
-import contextlib
 import logging
-import grpc
 import argparse
+import numpy as np
+import pygame
 
-from PyQt5.QtWidgets import QApplication
-from providers.camera_provider import CameraProvider
-from providers.joystick_provider import JoystickProvider
-from widgets.main_widget import MainWidget
-from utils.security import CarKey, read_pem
+from core.api_connection import ApiConnection
+from core.video_stream import VideoStream
 
-
-@contextlib.contextmanager
-def create_client_channel(host, car_key):
-    call_credentials = grpc.metadata_call_credentials(CarKey(car_key), name='Virtual key for the car')
-
-    channel_credentials = grpc.ssl_channel_credentials(read_pem('ssl/ca.pem'),
-                                                       read_pem('ssl/client-key.pem'),
-                                                       read_pem('ssl/client.pem'))
-
-    composite_credentials = grpc.composite_channel_credentials(
-        channel_credentials,
-        call_credentials,
-    )
-
-    yield grpc.secure_channel(host, composite_credentials)
+logger = logging.getLogger(__name__)
 
 
 def main(args):
     logging.basicConfig(level=logging.DEBUG if args['verbose'] else logging.INFO)
 
-    app = QApplication(sys.argv)
+    pygame.init()
+    pygame.joystick.init()
+    logger.debug('Number of available joysticks: {}'.format(pygame.joystick.get_count()))
 
-    logging.debug('Initializing providers')
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
 
-    with create_client_channel('{}:{}'.format(args['address'], args['port']), args['car_key']) as channel:
-        providers = {
-            'camera': CameraProvider(app, channel),
-            'joystick': JoystickProvider(app)
-        }
+    with VideoStream(args['address'], args['stream_port']) as stream:
+        with ApiConnection(args['address'], args['api_port'], args['car_key']) as api:
+            is_running = True
 
-        logging.debug('Starting providers')
+            while is_running:
+                for event in pygame.event.get():
+                    logger.debug('Received event {}'.format(event))
 
-        for provider in providers.values():
-            provider.start()
-
-        logging.debug('Initializing main widget')
-
-        main_widget = MainWidget(providers, channel)
-        main_widget.show()
-
-    sys.exit(app.exec_())
+                    if event.type == pygame.JOYAXISMOTION:
+                        if event.axis == 1:
+                            api.properties['car.velocity'].set(-event.value / 1.5)
+                        if event.axis == 2:
+                            angle = np.interp(-pow(event.value, 3), [-1, 1], [np.deg2rad(-60), np.deg2rad(60)])
+                            api.properties['car.steering_angle'].set(angle)
+                    elif event.type == pygame.JOYHATMOTION:
+                        if event.value == (0, 1):
+                            api.properties['camera.rotation'].set(np.deg2rad(0))
+                        elif event.value == (-1, 0):
+                            api.properties['camera.rotation'].set(np.deg2rad(90))
+                        elif event.value == (1, 0):
+                            api.properties['camera.rotation'].set(np.deg2rad(-90))
+                    elif event.type == pygame.JOYBUTTONDOWN and event.button == 9:
+                        is_running = False
 
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('-a', '--address', default='raspberrypi', help='Address of the Raspberry PI')
-    ap.add_argument('-p', '--port', type=int, default=50051, help='Listening port of the API')
+    ap.add_argument('-ap', '--api-port', type=int, default=50051, help='Listening port of the API')
+    ap.add_argument('-sp', '--stream-port', type=int, default=8080, help='Listening port of the MJPG stream')
     ap.add_argument('-ck', '--car-key', required=True, help='Key of the car')
     ap.add_argument('-v', '--verbose', help='Show all log messages', action='store_true')
     args = vars(ap.parse_args())

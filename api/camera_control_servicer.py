@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 import threading
 import generated.camera_control_pb2_grpc
 
@@ -15,15 +16,13 @@ class CameraControlServicer(generated.camera_control_pb2_grpc.CameraControlServi
         self.controller = controller
 
     def SetRotation(self, request, context):
-        logger.info('Set camera rotation to horizontal angle {} and vertical angle {}'.format(request.horizontal,
-                                                                                              request.vertical))
+        logger.info('Set camera rotation to angle {}'.format(request.angle))
 
-        horizontal_angle = clip_horizontal_angle(request.horizontal)
-        logger.debug('Clipped horizontal angle is {}'.format(horizontal_angle))
+        angle = request.angle
+        angle = np.clip(request.angle, np.deg2rad(-90), np.deg2rad(90))
+        angle = np.interp(angle, [np.deg2rad(-90), np.deg2rad(90)], [np.deg2rad(0), np.deg2rad(180)])
 
-        vertical_angle = clip_vertical_angle(request.vertical)
-        logger.debug('Clipped vertical angle is {}'.format(vertical_angle))
+        logger.debug('Normalized camera angle is {}'.format(angle))
 
-        self.controller.write(Controller.CMD_SERVO2, angle_to_pwm(horizontal_angle))
-        self.controller.write(Controller.CMD_SERVO3, angle_to_pwm(vertical_angle))
+        self.controller.write(Controller.CMD_SERVO2, angle_to_pwm(angle))
         return SetCameraRotationResponse()

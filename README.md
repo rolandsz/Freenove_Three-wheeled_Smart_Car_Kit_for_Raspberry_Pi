@@ -60,7 +60,7 @@ sudo raspi-config
 ```
 
 ### Client
-The client is a PyQt5 application that connects to the API running on the Raspberry PI via gRPC, which means you may run the client on an arbitrary device of your choice. You’ll need to setup the environment and generate the interface definitions by executing the following commands in order.
+The client connects to the API running on the Raspberry PI via gRPC, which means you may run the client on an arbitrary device of your choice. You’ll need to setup the environment and generate the interface definitions by executing the following commands in order.
 
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/client
@@ -72,6 +72,12 @@ python -m grpc_tools.protoc -I../protos --python_out=./generated --grpc_python_o
 ```
 
 ## Usage
+
+### mjpg-streamer
+```
+mjpg_streamer -i "input_uvc.so -r 320x240"
+```
+
 ### API
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/api
@@ -82,5 +88,5 @@ python3 api.py --port 50051
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/client
 conda activate smart-car-client
-python client.py --address raspberrypi --port 50051 --car-key <your unique car key displayed by the API upon startup>
+python client.py --address raspberrypi --api-port 50051 --stream-port 8080 --car-key <your unique car key displayed by the API upon startup>
 ```

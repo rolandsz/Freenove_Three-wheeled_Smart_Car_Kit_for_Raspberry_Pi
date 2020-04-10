@@ -33,7 +33,9 @@ class CarControlServicer(generated.car_control_pb2_grpc.CarControlServicer):
     def SetSteeringAngle(self, request, context):
         logger.info('Set steering angle to {}'.format(request.angle))
 
-        angle = np.clip(request.angle, np.deg2rad(30), np.deg2rad(150))
+        angle = np.clip(request.angle, np.deg2rad(-60), np.deg2rad(60))
+        angle = np.interp(angle, [np.deg2rad(-60), np.deg2rad(60)], [np.deg2rad(30), np.deg2rad(150)])
+
         logger.debug('Normalized steering angle is {}'.format(angle))
 
         self.controller.write(Controller.CMD_SERVO1, angle_to_pwm(angle))

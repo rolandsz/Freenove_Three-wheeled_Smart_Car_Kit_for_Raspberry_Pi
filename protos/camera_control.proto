@@ -2,8 +2,7 @@ syntax = "proto3";
 package freenove.smart_car;
 
 message SetCameraRotationRequest {
-  float horizontal = 1;
-  float vertical = 2;
+  float angle = 1;
 }
 
 message SetCameraRotationResponse {}

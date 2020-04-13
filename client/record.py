@@ -22,7 +22,7 @@ def main(args):
 
     with VideoStream(args['address'], args['stream_port']) as stream:
         with ApiConnection(args['address'], args['api_port'], args['car_key']) as api:
-            recorder = Recorder(args['recorder_output_dir'])
+            recorder = Recorder(args['datasets_dir'])
             stream.register_callback(lambda frame: recorder.record(frame, api.properties))
 
             while True:
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     ap.add_argument('-ap', '--api-port', type=int, default=50051, help='Listening port of the API')
     ap.add_argument('-sp', '--stream-port', type=int, default=8080, help='Listening port of the MJPG stream')
     ap.add_argument('-ck', '--car-key', required=True, help='Key of the car')
-    ap.add_argument('-ro', '--recorder-output-dir', default='recordings', help='Output directory where the recordings should be stored')
+    ap.add_argument('-dd', '--datasets-dir', default='datasets', help='Output directory where the datasets should be stored')
     ap.add_argument('-v', '--verbose', help='Show all log messages', action='store_true')
     args = vars(ap.parse_args())
 

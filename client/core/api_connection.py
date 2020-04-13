@@ -27,8 +27,8 @@ class ApiConnection:
         self.properties = {
             'car.velocity': CarVelocityProperty(0.0),
             'car.steering_angle': CarSteeringAngleProperty(0.0),
-            'led.color': LedColorProperty([0, 0, 0]),
-            'camera.rotation': CameraRotationProperty(np.deg2rad(0))
+            'led.color': LedColorProperty([0, 255, 0]),
+            'camera.rotation': CameraRotationProperty(0)
         }
 
     def __enter__(self):

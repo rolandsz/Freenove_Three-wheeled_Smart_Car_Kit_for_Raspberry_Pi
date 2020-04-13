@@ -74,24 +74,45 @@ class DatasetReader(Dataset):
         super().__init__(datasets_dir, stamp)
         self.annotations = pd.read_csv(self.get_annotations_csv_path(), index_col='sequence')
         self.batch_size = batch_size
-        self.from_index = 0
+        self.X = None
+        self.y = None
+        self.sequence = 0
 
-    def read_next_sliding_batch(self):
-        to_index = self.from_index + self.batch_size
-        batch = self.annotations.iloc[self.from_index:to_index]
+    def first(self):
+        initial_batch = self.annotations.iloc[0:self.batch_size]
 
-        if batch.shape[0] == self.batch_size:
+        if initial_batch.shape[0] == self.batch_size:
             X = []
             y = []
 
-            for sequence, annotation in batch.iterrows():
+            for sequence, annotation in initial_batch.iterrows():
                 X.append(self.read_frame(sequence))
                 y.append([annotation['car.velocity'], annotation['car.steering_angle']])
 
-            self.from_index += 1
-            return np.array(X), np.array(y)
-        else:
+            self.X = np.array(X)
+            self.y = np.array(y)
+
+            self.sequence = self.batch_size
+
+        return self.X, self.y
+
+    def next(self):
+        if self.sequence == self.annotations.shape[0]:
             return None
+
+        self.X = np.delete(self.X, 0, axis=0)
+        self.X = np.append(self.X, [self.read_frame(self.sequence)], axis=0)
+
+        self.y = np.delete(self.y, 0, axis=0)
+
+        annotation = self.annotations.iloc[self.sequence]
+        self.y = np.append(self.y, [[annotation['car.velocity'], annotation['car.steering_angle']]], axis=0)
+
+        self.sequence += 1
+        return self.X, self.y
+
+    def num_batches(self):
+        return self.annotations.shape[0] - self.batch_size + 1
 
     def read_frame(self, sequence):
         return cv2.imread(self.get_frame_jpg_path(sequence))

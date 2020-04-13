@@ -88,5 +88,5 @@ python3 api.py --port 50051
 ```
 cd ~/Freenove_Three-wheeled_Smart_Car_Kit_for_Raspberry_Pi/client
 conda activate smart-car-client
-python client.py --address raspberrypi --api-port 50051 --stream-port 8080 --car-key <your unique car key displayed by the API upon startup>
+python record.py --address raspberrypi --api-port 50051 --stream-port 8080 --car-key <your unique car key displayed by the API upon startup>
 ```

@@ -1,13 +1,12 @@
 import os
 import cv2
 import pandas as pd
+import numpy as np
 
 from datetime import datetime
 
 
 class Dataset:
-    FRAMES_DIRECTORY = 'frames'
-
     def __init__(self, datasets_dir, stamp):
         self.datasets_dir = datasets_dir
         self.stamp = stamp
@@ -20,7 +19,7 @@ class Dataset:
         return '{}.jpg'.format(sequence)
 
     def get_frames_directory_path(self):
-        return os.path.join(self.get_dataset_directory_path(), Dataset.FRAMES_DIRECTORY)
+        return os.path.join(self.get_dataset_directory_path(), 'frames')
 
     def get_frame_jpg_path(self, sequence):
         return os.path.join(self.get_frames_directory_path(), self.get_frame_filename(sequence))
@@ -52,9 +51,7 @@ class DatasetWriter(Dataset):
         cv2.imwrite(self.get_frame_jpg_path(sequence), frame)
 
     def write_annotation(self, sequence, properties):
-        annotation = {
-            'frame': '{}/{}.jpg'.format(Dataset.FRAMES_DIRECTORY, sequence)
-        }
+        annotation = {}
 
         for key, value in properties.items():
             annotation[key] = value.get()
@@ -68,4 +65,33 @@ class DatasetWriter(Dataset):
 
     def flush(self):
         df = pd.DataFrame(self.annotations)
-        df.to_csv(self.get_annotations_csv_path(), index=False)
+        df.to_csv(self.get_annotations_csv_path(), index_label='sequence')
+
+
+class DatasetReader(Dataset):
+
+    def __init__(self, datasets_dir, stamp, batch_size=60):
+        super().__init__(datasets_dir, stamp)
+        self.annotations = pd.read_csv(self.get_annotations_csv_path(), index_col='sequence')
+        self.batch_size = batch_size
+        self.from_index = 0
+
+    def read_next_sliding_batch(self):
+        to_index = self.from_index + self.batch_size
+        batch = self.annotations.iloc[self.from_index:to_index]
+
+        if batch.shape[0] == self.batch_size:
+            X = []
+            y = []
+
+            for sequence, annotation in batch.iterrows():
+                X.append(self.read_frame(sequence))
+                y.append([annotation['car.velocity'], annotation['car.steering_angle']])
+
+            self.from_index += 1
+            return np.array(X), np.array(y)
+        else:
+            return None
+
+    def read_frame(self, sequence):
+        return cv2.imread(self.get_frame_jpg_path(sequence))

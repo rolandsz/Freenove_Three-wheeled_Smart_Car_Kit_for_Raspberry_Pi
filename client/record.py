@@ -32,7 +32,7 @@ def main(args):
                     if event.type == pygame.JOYAXISMOTION:
                         if event.axis == 1:
                             api.properties['car.velocity'].set(-event.value / 2)
-                        if event.axis == 2:
+                        elif event.axis == 2:
                             angle = np.interp(-pow(event.value, 3), [-1, 1], [np.deg2rad(-60), np.deg2rad(60)])
                             api.properties['car.steering_angle'].set(angle)
                     elif event.type == pygame.JOYHATMOTION:

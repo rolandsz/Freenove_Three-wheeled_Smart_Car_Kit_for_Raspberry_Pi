@@ -15,18 +15,22 @@ class VideoStream:
             self.parent = parent
             self.stream = cv2.VideoCapture('http://{}:{}/?action=stream'.format(address, port), cv2.CAP_FFMPEG)
 
-            logger.debug('Capture thread initialized')
+            logger.info('Capture thread initialized')
 
         def run(self):
             self.is_running = True
-            logger.debug('Capture thread started')
+            logger.info('Capture thread started')
 
             while self.is_running:
-                ret, self.parent.current_frame = self.stream.read()
+                ret, frame = self.stream.read()
+
+                if ret:
+                    self.parent.on_new_frame(frame)
+
                 self.is_running &= ret
 
             self.stream.release()
-            logger.debug('Capture thread exited')
+            logger.info('Capture thread exited')
 
     class PlaybackThread(threading.Thread):
 
@@ -34,23 +38,29 @@ class VideoStream:
             threading.Thread.__init__(self)
             self.is_running = False
             self.parent = parent
+            self.parent.register_callback(self.on_new_frame)
+            self.last_frame = None
 
-            logger.debug('Playback thread initialized')
+            logger.info('Playback thread initialized')
+
+        def on_new_frame(self, frame):
+            self.last_frame = frame
 
         def run(self):
             self.is_running = True
-            logger.debug('Playback thread started')
+            logger.info('Playback thread started')
 
             while self.is_running:
-                if self.parent.current_frame is not None:
-                    cv2.imshow('Video stream', self.parent.current_frame)
-                    cv2.waitKey(1)
+                while self.last_frame is not None:
+                    cv2.imshow('Video stream', self.last_frame)
+                    cv2.waitKey(16)
 
             cv2.destroyAllWindows()
-            logger.debug('Playback thread exited')
+            logger.info('Playback thread exited')
 
     def __init__(self, address, port):
-        self.current_frame = None
+        self.frame = None
+        self.callbacks = []
         self.capture_thread = VideoStream.CaptureThread(self, address, port)
         self.playback_thread = VideoStream.PlaybackThread(self)
 
@@ -65,3 +75,15 @@ class VideoStream:
 
         self.capture_thread.is_running = False
         self.capture_thread.join()
+
+    def register_callback(self, cb):
+        if not callable(cb):
+            logger.error('The provided callback is not callable')
+            return
+
+        self.callbacks.append(cb)
+        logger.debug('Added new callback: {}'.format(cb))
+
+    def on_new_frame(self, frame):
+        for callback in self.callbacks:
+            callback(frame)

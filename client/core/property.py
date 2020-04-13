@@ -7,6 +7,8 @@ from generated.camera_control_pb2 import SetCameraRotationRequest
 from generated.camera_control_pb2_grpc import CameraControlStub
 from generated.car_control_pb2 import SetVelocityRequest, SetSteeringAngleRequest
 from generated.car_control_pb2_grpc import CarControlStub
+from generated.led_control_pb2 import SetColorRequest
+from generated.led_control_pb2_grpc import LedControlStub
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +68,14 @@ class CarSteeringAngleProperty(Property):
 
     def commit(self, channel):
         CarControlStub(channel).SetSteeringAngle(SetSteeringAngleRequest(angle=self.commit_value))
+
+
+class LedColorProperty(Property):
+
+    def commit(self, channel):
+        LedControlStub(channel).SetColor(SetColorRequest(r=self.commit_value[0],
+                                                         g=self.commit_value[1],
+                                                         b=self.commit_value[2]))
 
 
 class CameraRotationProperty(Property):

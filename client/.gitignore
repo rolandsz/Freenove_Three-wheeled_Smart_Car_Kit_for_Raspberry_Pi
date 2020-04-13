@@ -80,3 +80,7 @@ generated
 # SSL
 ssl
 !ssl/.gitkeep
+
+# Recordings
+recordings
+!recordings/.gitkeep

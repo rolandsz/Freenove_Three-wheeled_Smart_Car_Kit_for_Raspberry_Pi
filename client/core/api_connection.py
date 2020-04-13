@@ -3,7 +3,8 @@ import os
 import logging
 import grpc
 
-from core.property import PropertyUpdateThread, CarVelocityProperty, CarSteeringAngleProperty, CameraRotationProperty
+from core.property import PropertyUpdateThread, CarVelocityProperty, CarSteeringAngleProperty, CameraRotationProperty, \
+    LedColorProperty
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class ApiConnection:
         self.properties = {
             'car.velocity': CarVelocityProperty(0.0),
             'car.steering_angle': CarSteeringAngleProperty(0.0),
+            'led.color': LedColorProperty([0, 0, 0]),
             'camera.rotation': CameraRotationProperty(np.deg2rad(0))
         }
 
